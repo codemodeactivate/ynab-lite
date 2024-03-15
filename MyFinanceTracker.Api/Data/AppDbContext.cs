@@ -11,5 +11,8 @@ namespace MyFinanceTracker.Api.Data
         }
 
         public DbSet<Transaction> Transactions { get; set; }
+        public DbSet<Tag> Tags { get; set; }
+        public DbSet<User> Users { get; set; }
+        public DbSet<Category> Categories { get; set; }
     }
 }

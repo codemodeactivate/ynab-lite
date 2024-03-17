@@ -15,4 +15,3 @@ I'll clean this up later, but for now I'm just working on data models and the AP
 - [ ] User can edit transaction
 - [ ] User can delete transaction
 - [ ] User can view transactions
-- [ ] 

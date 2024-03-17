@@ -31,6 +31,41 @@ namespace MyFinanceTracker.Api.Controllers
             _configuration = configuration;
         }
 
+
+
+        [HttpPost("register")]
+        public async Task<ActionResult<User>> Register(RegisterDto registerDto)
+        {
+            //check if user exists
+            if (await _context.Users.AnyAsync(u => u.Email == registerDto.Email))
+            {
+                return BadRequest("User already exists with this email.");
+            }
+
+            //Hash it
+            string hashedPassword = BCrypt.Net.BCrypt.HashPassword(registerDto.Password);
+
+            //create new User
+            var user = new User
+            {
+                Email = registerDto.Email,
+                PasswordHash = hashedPassword,
+                FirstName = registerDto.FirstName,
+                LastName = registerDto.LastName
+            };
+
+            // Add the new user to the context & save changes
+            _context.Users.Add(user);
+            await _context.SaveChangesAsync();
+
+            // Return the new user
+            // for security maybe don't return everything
+            return CreatedAtAction(nameof(Register), new { id = user.Id }, user);  
+            // return 201 status code, include a Location header in res pointing to where
+            // newly created user can be accessed based on URL of app 
+            // include the user object in res body
+
+        }
         [HttpPost("login")]
         public async Task<ActionResult<string>> Login(LoginDto loginDto)
         {

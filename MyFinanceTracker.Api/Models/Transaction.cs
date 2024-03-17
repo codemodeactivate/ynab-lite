@@ -32,7 +32,7 @@ namespace MyFinanceTracker.Api.Models
         public int CategoryId { get; set; }
         public string CategoryName { get; set; }
         public int? BankAccountId { get; set; } //foreign key to bank account
-        public BankAccount BankAccount { get; set; } //navigation property
+        public BankAccount? BankAccount { get; set; } //navigation property
         public bool IsDeposit { get; set; } // True for deposit, false for withdrawal
         public List<string> Tags { get; set; } = new List<string>();
     }

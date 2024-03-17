@@ -31,8 +31,8 @@ namespace MyFinanceTracker.Api.Data
             // Seed BankAccounts
             var bankAccounts = new BankAccount[]
             {
-                new CheckingAccount{AccountName="Checking Account", AccountNumber="123456", BankName="Bank A", Balance=1000.00M},
-                new SavingsAccount{AccountName="Savings Account", AccountNumber="654321", BankName="Bank B", Balance=5000.00M, InterestRate=1.5M}
+                new CheckingAccount{AccountName="Checking Account", AccountNumber="123456", BankName="Bank A", Balance=1000.00M, UserId = users[0].Id},
+                new SavingsAccount{AccountName="Savings Account", AccountNumber="654321", BankName="Bank B", Balance=5000.00M, InterestRate=1.5M, UserId = users[1].Id}
             };
             foreach (BankAccount b in bankAccounts)
             {

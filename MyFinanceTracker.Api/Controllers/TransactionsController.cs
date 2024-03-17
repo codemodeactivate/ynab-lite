@@ -63,23 +63,30 @@ namespace MyFinanceTracker.Api.Controllers
         [HttpPost]
         public async Task<ActionResult<TransactionDto>> Post(TransactionDto transactionDto)
         {
+            // Assuming BankAccountId is non-nullable but checking for existence
+            var bankAccount = await _context.BankAccounts.FindAsync(transactionDto.BankAccountId);
+            if (bankAccount == null)
+            {
+                return BadRequest($"Bank account not found.");
+            }
+
             var transaction = new Transaction
             {
-                // Map DTO to Entity, excluding Tags for simplicity in this example
                 Description = transactionDto.Description,
                 Amount = transactionDto.Amount,
                 Date = transactionDto.Date,
                 Memo = transactionDto.Memo,
                 IsCleared = transactionDto.IsCleared,
                 CategoryId = transactionDto.CategoryId,
-                // Handling of Tags and CategoryName is omitted for brevity
+                BankAccountId = transactionDto.BankAccountId, // Directly assigned, as it's non-nullable
             };
+
+            bankAccount.Balance += transaction.Amount;
 
             _context.Transactions.Add(transaction);
             await _context.SaveChangesAsync();
 
-            // Return the newly created Transaction as a DTO
-            return CreatedAtAction(nameof(Get), new { id = transaction.Id }, new TransactionDto
+            var responseDto = new TransactionDto
             {
                 Id = transaction.Id,
                 Description = transaction.Description,
@@ -88,9 +95,13 @@ namespace MyFinanceTracker.Api.Controllers
                 Memo = transaction.Memo,
                 IsCleared = transaction.IsCleared,
                 CategoryId = transaction.CategoryId,
-                // Populate CategoryName and Tags as needed
-            });
+                BankAccountId = transaction.BankAccountId, // Assuming BankAccountId is a simple int
+                                                           // Populate other required fields like CategoryName and Tags if necessary
+            };
+
+            return CreatedAtAction(nameof(Get), new { id = transaction.Id }, responseDto);
         }
+
 
     }
 }

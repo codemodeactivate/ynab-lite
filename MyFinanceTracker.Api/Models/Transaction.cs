@@ -12,6 +12,9 @@ namespace MyFinanceTracker.Api.Models
         public bool IsCleared { get; set; } = false;
 
         public List<Tag> Tags { get; set; } = new List<Tag>();
+        public int? BankAccountId { get; set; } //foreign key to bank account
+        public BankAccount BankAccount { get; set; } //navigation property
+        public bool IsDeposit { get; set; } // True for deposit, false for withdrawal
 
         //category reference
         public int CategoryId { get; set; }
@@ -28,6 +31,9 @@ namespace MyFinanceTracker.Api.Models
         public bool IsCleared { get; set; }
         public int CategoryId { get; set; }
         public string CategoryName { get; set; }
+        public int? BankAccountId { get; set; } //foreign key to bank account
+        public BankAccount BankAccount { get; set; } //navigation property
+        public bool IsDeposit { get; set; } // True for deposit, false for withdrawal
         public List<string> Tags { get; set; } = new List<string>();
     }
 

@@ -30,6 +30,14 @@ builder.Services.AddControllers(); // This line is crucial for your app to recog
 
 var app = builder.Build();
 
+// Seed the database with example data
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var context = services.GetRequiredService<AppDbContext>();
+    DbInitializer.Initialize(context);
+}
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {

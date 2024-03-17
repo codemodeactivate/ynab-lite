@@ -12,8 +12,8 @@ using MyFinanceTracker.Api.Data;
 namespace MyFinanceTracker.Api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240315194333_UpdateDatabase")]
-    partial class UpdateDatabase
+    [Migration("20240316233652_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -84,6 +84,9 @@ namespace MyFinanceTracker.Api.Migrations
 
                     b.Property<decimal>("Amount")
                         .HasColumnType("decimal(65,30)");
+
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime(6)");

@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -6,30 +7,13 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace MyFinanceTracker.Api.Migrations
 {
     /// <inheritdoc />
-    public partial class UpdateDatabase : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<string>(
-                name: "Memo",
-                table: "Transactions",
-                type: "longtext",
-                nullable: true)
+            migrationBuilder.AlterDatabase()
                 .Annotation("MySql:CharSet", "utf8mb4");
-
-            migrationBuilder.AddColumn<int>(
-                name: "UserId",
-                table: "Transactions",
-                type: "int",
-                nullable: true);
-
-            migrationBuilder.AddColumn<bool>(
-                name: "isCleared",
-                table: "Transactions",
-                type: "tinyint(1)",
-                nullable: false,
-                defaultValue: false);
 
             migrationBuilder.CreateTable(
                 name: "Categories",
@@ -79,6 +63,33 @@ namespace MyFinanceTracker.Api.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Users", x => x.Id);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "Transactions",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    Description = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Amount = table.Column<decimal>(type: "decimal(65,30)", nullable: false),
+                    Date = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    Memo = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    isCleared = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    CategoryId = table.Column<int>(type: "int", nullable: false),
+                    UserId = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Transactions", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Transactions_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id");
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
@@ -133,11 +144,6 @@ namespace MyFinanceTracker.Api.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Transactions_UserId",
-                table: "Transactions",
-                column: "UserId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_CategoryTransaction_TransactionsId",
                 table: "CategoryTransaction",
                 column: "TransactionsId");
@@ -147,21 +153,15 @@ namespace MyFinanceTracker.Api.Migrations
                 table: "TagTransaction",
                 column: "TransactionsId");
 
-            migrationBuilder.AddForeignKey(
-                name: "FK_Transactions_Users_UserId",
+            migrationBuilder.CreateIndex(
+                name: "IX_Transactions_UserId",
                 table: "Transactions",
-                column: "UserId",
-                principalTable: "Users",
-                principalColumn: "Id");
+                column: "UserId");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropForeignKey(
-                name: "FK_Transactions_Users_UserId",
-                table: "Transactions");
-
             migrationBuilder.DropTable(
                 name: "CategoryTransaction");
 
@@ -169,29 +169,16 @@ namespace MyFinanceTracker.Api.Migrations
                 name: "TagTransaction");
 
             migrationBuilder.DropTable(
-                name: "Users");
-
-            migrationBuilder.DropTable(
                 name: "Categories");
 
             migrationBuilder.DropTable(
                 name: "Tags");
 
-            migrationBuilder.DropIndex(
-                name: "IX_Transactions_UserId",
-                table: "Transactions");
+            migrationBuilder.DropTable(
+                name: "Transactions");
 
-            migrationBuilder.DropColumn(
-                name: "Memo",
-                table: "Transactions");
-
-            migrationBuilder.DropColumn(
-                name: "UserId",
-                table: "Transactions");
-
-            migrationBuilder.DropColumn(
-                name: "isCleared",
-                table: "Transactions");
+            migrationBuilder.DropTable(
+                name: "Users");
         }
     }
 }

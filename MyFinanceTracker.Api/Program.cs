@@ -4,6 +4,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using MyFinanceTracker.Api.Data;
 using System.Reflection;
+using BCrypt.Net;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -38,6 +39,9 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 // Add services to the container.
 builder.Services.AddEndpointsApiExplorer();
+
+// Add support for controllers
+builder.Services.AddControllers(); // This line is crucial for your app to recognize controllers
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
@@ -47,9 +51,6 @@ builder.Services.AddSwaggerGen(c =>
     var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
     c.IncludeXmlComments(xmlPath); // Make sure this line is within the AddSwaggerGen call
 });
-// Add support for controllers
-builder.Services.AddControllers(); // This line is crucial for your app to recognize controllers
-
 
 var app = builder.Build();
 
@@ -76,6 +77,7 @@ app.UseAuthorization(); // This line is crucial for enabling authorization
 app.MapControllers(); // Ensure this line is present to map attribute-routed controllers
 
 app.Run();
+
 
 
 //record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)

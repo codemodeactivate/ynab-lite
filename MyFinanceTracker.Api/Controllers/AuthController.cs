@@ -72,6 +72,7 @@ namespace MyFinanceTracker.Api.Controllers
             
 
         }
+
         [HttpPost("login")]
         public async Task<ActionResult<string>> Login(LoginDto loginDto)
         {
@@ -80,8 +81,7 @@ namespace MyFinanceTracker.Api.Controllers
 
             // Temporary check for testing with plain text password
             bool passwordIsValid = user != null &&
-                (user.PasswordHash == loginDto.Password ||
-                 BCrypt.Net.BCrypt.Verify(loginDto.Password, user.PasswordHash));
+                (user.PasswordHash == loginDto.Password);
 
             if (!passwordIsValid)
             {

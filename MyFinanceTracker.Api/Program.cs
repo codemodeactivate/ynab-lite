@@ -4,12 +4,16 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using MyFinanceTracker.Api.Data;
 using System.Reflection;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Authentication.Google;
 using BCrypt.Net;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Retrieve the connection string from appsettings.json
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+var services = builder.Services;
+var configuration = builder.Configuration;
 
 //JWT Authentication
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -28,14 +32,20 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
+//google auth
+// Configure Google authentication
+services.AddAuthentication().AddGoogle(googleOptions =>
+{
+    googleOptions.ClientId = configuration["Authentication:Google:ClientId"];
+    googleOptions.ClientSecret = configuration["Authentication:Google:ClientSecret"];
+});
+
 // This line ensures that authorization can be applied to endpoints
 builder.Services.AddAuthorization();
-
 
 // Register and configure AppDbContext to use MySQL
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
-
 
 // Add services to the container.
 builder.Services.AddEndpointsApiExplorer();
@@ -57,8 +67,8 @@ var app = builder.Build();
 // Seed the database with example data
 using (var scope = app.Services.CreateScope())
 {
-    var services = scope.ServiceProvider;
-    var context = services.GetRequiredService<AppDbContext>();
+    var scopedServices = scope.ServiceProvider;
+    var context = scopedServices.GetRequiredService<AppDbContext>();
     DbInitializer.Initialize(context);
 }
 
@@ -77,10 +87,3 @@ app.UseAuthorization(); // This line is crucial for enabling authorization
 app.MapControllers(); // Ensure this line is present to map attribute-routed controllers
 
 app.Run();
-
-
-
-//record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-//{
-//    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-//}

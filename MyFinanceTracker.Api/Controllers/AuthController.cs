@@ -42,6 +42,12 @@ namespace MyFinanceTracker.Api.Controllers
                 return BadRequest("User already exists with this email.");
             }
 
+            //check if passwords match
+            if (registerDto.Password != registerDto.ConfirmPassword)
+            {
+                return BadRequest("Passwords do not match.");
+            }
+
             //Hash it
             string hashedPassword = BCrypt.Net.BCrypt.HashPassword(registerDto.Password);
 
@@ -63,7 +69,7 @@ namespace MyFinanceTracker.Api.Controllers
             return CreatedAtAction(nameof(Register), new { id = user.Id }, user);  
             // return 201 status code, include a Location header in res pointing to where
             // newly created user can be accessed based on URL of app 
-            // include the user object in res body
+            
 
         }
         [HttpPost("login")]

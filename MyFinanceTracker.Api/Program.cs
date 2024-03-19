@@ -7,7 +7,7 @@ using System.Reflection;
 using Microsoft.OpenApi.Models;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.AspNetCore.Authentication.Google;
+//using Microsoft.AspNetCore.Authentication.Google;
 using BCrypt.Net;
 
 var builder = WebApplication.CreateBuilder(args);

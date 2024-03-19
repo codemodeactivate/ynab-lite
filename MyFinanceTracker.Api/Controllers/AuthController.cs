@@ -82,21 +82,21 @@ namespace MyFinanceTracker.Api.Controllers
         [HttpPost("login")]
         public async Task<ActionResult<string>> Login(LoginDto loginDto)
         {
-            var user = await _context.Users
-                .FirstOrDefaultAsync(u => u.Email == loginDto.Email);
+            // Find the user by email
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == loginDto.Email);
 
-            // Temporary check for testing with plain text password
-            bool passwordIsValid = user != null &&
-                (user.PasswordHash == loginDto.Password);
-
-            if (!passwordIsValid)
+            // Check if user exists and password is correct
+            if (user == null || !BCrypt.Net.BCrypt.Verify(loginDto.Password, user.PasswordHash))
             {
                 return Unauthorized("Invalid email or password.");
             }
 
+            // User is authenticated, generate JWT
             var token = GenerateJwtToken(user);
-            return Ok(token);
+
+            return Ok(new { Token = token });
         }
+
 
         private string GenerateJwtToken(User user)
         {
@@ -167,9 +167,11 @@ namespace MyFinanceTracker.Api.Controllers
                     };
                     _context.Users.Add(newUser);
                     await _context.SaveChangesAsync();
+                    existingUser = newUser;
                 }
+                var token = GenerateJwtToken(existingUser);
+                return Ok(new { Token = token, Message = "Google authentication successful." });
 
-                return Ok("Google authentication successful.");
             }
             catch (HttpRequestException httpEx)
             {

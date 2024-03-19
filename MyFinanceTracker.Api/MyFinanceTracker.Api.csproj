@@ -5,17 +5,27 @@
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
-	  <UserSecretsId>7efaeddf-71c3-4363-b960-a7526a9ca678</UserSecretsId>
-  </PropertyGroup>
+	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="BCrypt.Net" Version="0.1.0" />
-		<PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="8.0.3" />
+	  <Compile Remove="Migrations\20240319120305_AddGoogleIdToUser.cs" />
+	  <Compile Remove="Migrations\20240319120305_AddGoogleIdToUser.Designer.cs" />
+	  <Compile Remove="Migrations\20240319120723_InitialCreate.cs" />
+	  <Compile Remove="Migrations\20240319120723_InitialCreate.Designer.cs" />
+	  <Compile Remove="Migrations\AppDbContextModelSnapshot.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.3" />
 		<PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.2" />
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
 		<PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="8.0.0" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.0" />
+		<PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="8.0.3" />
+
+
+
 	</ItemGroup>
 
 	<ItemGroup>

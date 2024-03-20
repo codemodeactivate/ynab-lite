@@ -109,7 +109,7 @@ namespace MyFinanceTracker.Api.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "Budget",
+                name: "Budgets",
                 columns: table => new
                 {
                     BudgetId = table.Column<int>(type: "int", nullable: false)
@@ -122,9 +122,9 @@ namespace MyFinanceTracker.Api.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Budget", x => x.BudgetId);
+                    table.PrimaryKey("PK_Budgets", x => x.BudgetId);
                     table.ForeignKey(
-                        name: "FK_Budget_Users_UserId",
+                        name: "FK_Budgets_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id",
@@ -168,9 +168,9 @@ namespace MyFinanceTracker.Api.Migrations
                 {
                     table.PrimaryKey("PK_BudgetCategory", x => x.BudgetCategoryId);
                     table.ForeignKey(
-                        name: "FK_BudgetCategory_Budget_BudgetId",
+                        name: "FK_BudgetCategory_Budgets_BudgetId",
                         column: x => x.BudgetId,
-                        principalTable: "Budget",
+                        principalTable: "Budgets",
                         principalColumn: "BudgetId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
@@ -258,11 +258,6 @@ namespace MyFinanceTracker.Api.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Budget_UserId",
-                table: "Budget",
-                column: "UserId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_BudgetCategory_BudgetId",
                 table: "BudgetCategory",
                 column: "BudgetId");
@@ -271,6 +266,11 @@ namespace MyFinanceTracker.Api.Migrations
                 name: "IX_BudgetCategory_CategoryId",
                 table: "BudgetCategory",
                 column: "CategoryId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Budgets_UserId",
+                table: "Budgets",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Categories_UserId",
@@ -311,7 +311,7 @@ namespace MyFinanceTracker.Api.Migrations
                 name: "TagTransaction");
 
             migrationBuilder.DropTable(
-                name: "Budget");
+                name: "Budgets");
 
             migrationBuilder.DropTable(
                 name: "Tags");

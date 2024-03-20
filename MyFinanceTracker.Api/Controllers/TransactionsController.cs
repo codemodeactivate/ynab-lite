@@ -3,6 +3,7 @@ using MyFinanceTracker.Api.Data;
 using MyFinanceTracker.Api.Models;
 using System.Collections.Generic;
 using System.Linq;
+using MyFinanceTracker.Api.DTOs;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;    
 

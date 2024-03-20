@@ -12,11 +12,11 @@
         public User User { get; set; }
     }
 
-    public class BankAccount : Account
-    {
-        public string InstitutionName { get; set; }
-        public string AccountNumber { get; set; }
-        public double? InterestRate { get; set; } // Nullable for accounts that don't have an interest rate
-    }
+    //public class BankAccount : Account
+    //{
+    //    public string InstitutionName { get; set; }
+    //    public string AccountNumber { get; set; }
+    //    public double? InterestRate { get; set; } // Nullable for accounts that don't have an interest rate
+    //}
 
 }

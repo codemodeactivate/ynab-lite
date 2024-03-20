@@ -2,28 +2,25 @@
 
 public abstract class BankAccount
 {
-    public BankAccount() { }  // Ensure there's a parameterless constructor, even protected
-
     public int Id { get; set; }
-    public string AccountName { get; set; }
+    public string AccountName { get; set; } // Renamed from AccountName for consistency
     public string AccountNumber { get; set; }
     public string BankName { get; set; }
     public decimal Balance { get; set; }
     public int UserId { get; set; }
+    public string AccountType { get; set; } // To distinguish between Checking and Savings in the base class
 
+    // Navigation property for EF Core
     public User User { get; set; }
 }
 
 public class CheckingAccount : BankAccount
 {
-    public CheckingAccount() : base() { }  // Parameterless constructor for deserialization
-
-    public string AccountType { get; set; }
+    // CheckingAccount specific properties can go here
+    // For now, we'll inherit everything from BankAccount
 }
 
 public class SavingsAccount : BankAccount
 {
-    public SavingsAccount() : base() { }  // Parameterless constructor for deserialization
-
     public decimal InterestRate { get; set; }
 }

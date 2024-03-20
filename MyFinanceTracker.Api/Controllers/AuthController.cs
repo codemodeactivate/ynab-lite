@@ -82,32 +82,47 @@ namespace MyFinanceTracker.Api.Controllers
         [HttpPost("login")]
         public async Task<ActionResult<string>> Login(LoginDto loginDto)
         {
-            // Find the user by email
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == loginDto.Email);
+            _logger.LogInformation($"Login attempt for {loginDto.Email}");
 
-            // Check if user exists and password is correct
-            if (user == null || !BCrypt.Net.BCrypt.Verify(loginDto.Password, user.PasswordHash))
+            try
             {
-                return Unauthorized("Invalid email or password.");
+                var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == loginDto.Email);
+
+                if (user == null)
+                {
+                    _logger.LogWarning($"User not found for email: {loginDto.Email}");
+                    return Unauthorized("Invalid email or password.");
+                }
+
+                if (!BCrypt.Net.BCrypt.Verify(loginDto.Password, user.PasswordHash))
+                {
+                    _logger.LogWarning($"Invalid password attempt for user: {loginDto.Email}");
+                    return Unauthorized("Invalid email or password.");
+                }
+
+                _logger.LogInformation($"User authenticated: {loginDto.Email}");
+                var token = GenerateJwtToken(user);
+
+                return Ok(new { Token = token });
             }
-
-            // User is authenticated, generate JWT
-            var token = GenerateJwtToken(user);
-
-            return Ok(new { Token = token });
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"An error occurred during login for {loginDto.Email}");
+                return StatusCode(500, "An internal server error has occurred.");
+            }
         }
-
 
         private string GenerateJwtToken(User user)
         {
-            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
+            var keyBytes = Convert.FromBase64String(_configuration["Jwt:Key"]);
+            var securityKey = new SymmetricSecurityKey(keyBytes);
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
-            var claims = new[]
-            {
-            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new Claim(ClaimTypes.Name, user.Email)
-        };
+            var claims = new List<Claim>
+    {
+        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+        new Claim(ClaimTypes.Name, user.Email)
+    };
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {
@@ -123,6 +138,7 @@ namespace MyFinanceTracker.Api.Controllers
 
             return tokenHandler.WriteToken(token);
         }
+
 
         public class GoogleAuthTokenDto
         {

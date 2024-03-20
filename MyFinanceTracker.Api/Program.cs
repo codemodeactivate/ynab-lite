@@ -29,7 +29,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])),
+            IssuerSigningKey = new SymmetricSecurityKey(Convert.FromBase64String(builder.Configuration["Jwt:Key"])),
             ValidateIssuer = true,
             ValidIssuer = builder.Configuration["Jwt:Issuer"],
             ValidateAudience = true,
@@ -37,6 +37,23 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateLifetime = true,
             ClockSkew = TimeSpan.Zero // Optional: adjust the clock skew if necessary
         };
+
+        options.Events = new JwtBearerEvents
+        {
+            OnAuthenticationFailed = context =>
+            {
+                context.Response.Headers.Add("Authentication-Failed", "true");
+                Console.WriteLine($"Authentication failed: {context.Exception.Message}");
+                return Task.CompletedTask;
+            },
+            OnTokenValidated = context =>
+            {
+                Console.WriteLine($"Token validated: {context.SecurityToken}");
+                return Task.CompletedTask;
+            },
+        };
+
+
     });
 
 //google auth
@@ -63,6 +80,35 @@ builder.Services.AddControllers(); // This line is crucial for your app to recog
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
+    // Define a custom strategy for Schema Ids to avoid conflicts
+    c.CustomSchemaIds(type => type.FullName);
+    // Add JWT Authentication to Swagger
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Description = "JWT Authorization header using the Bearer scheme. Example: 'Authorization: Bearer {token}'",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "Bearer"
+    });
+
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement()
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                },
+                Scheme = "oauth2",
+                Name = "Bearer",
+                In = ParameterLocation.Header,
+            },
+            new List<string>()
+        }
+    });
 
     // Configure OAuth2 options for Swagger UI
     c.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
@@ -107,17 +153,18 @@ builder.Services.AddSwaggerGen(c =>
 
 var app = builder.Build();
 
-// Seed the database with example data
-using (var scope = app.Services.CreateScope())
-{
-    var scopedServices = scope.ServiceProvider;
-    var context = scopedServices.GetRequiredService<AppDbContext>();
-    DbInitializer.Initialize(context);
-}
+//// Seed the database with example data
+//using (var scope = app.Services.CreateScope())
+//{
+//    var scopedServices = scope.ServiceProvider;
+//    var context = scopedServices.GetRequiredService<AppDbContext>();
+//    DbInitializer.Initialize(context);
+//}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
+    app.UseDeveloperExceptionPage();
     app.UseSwagger();
     app.UseSwaggerUI(c =>
     {
@@ -129,6 +176,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseRouting(); // This line is crucial for enabling routing
 app.UseAuthentication(); // This line is crucial for enabling JWT authentication
 app.UseAuthorization(); // This line is crucial for enabling authorization
 

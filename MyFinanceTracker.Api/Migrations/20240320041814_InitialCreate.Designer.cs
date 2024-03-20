@@ -11,7 +11,7 @@ using MyFinanceTracker.Api.Data;
 namespace MyFinanceTracker.Api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240319121633_InitialCreate")]
+    [Migration("20240320041814_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -60,6 +60,44 @@ namespace MyFinanceTracker.Api.Migrations
                     b.HasDiscriminator<string>("AccountType").HasValue("BankAccount");
 
                     b.UseTphMappingStrategy();
+                });
+
+            modelBuilder.Entity("MyFinanceTracker.Api.Models.BankAccount", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<string>("AccountNumber")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<decimal>("Balance")
+                        .HasColumnType("decimal(65,30)");
+
+                    b.Property<string>("InstitutionName")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<double?>("InterestRate")
+                        .HasColumnType("double");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("BankAccount");
                 });
 
             modelBuilder.Entity("MyFinanceTracker.Api.Models.Category", b =>
@@ -207,9 +245,20 @@ namespace MyFinanceTracker.Api.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("MyFinanceTracker.Api.Models.BankAccount", b =>
+                {
+                    b.HasOne("MyFinanceTracker.Api.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("MyFinanceTracker.Api.Models.Transaction", b =>
                 {
-                    b.HasOne("BankAccount", "BankAccount")
+                    b.HasOne("MyFinanceTracker.Api.Models.BankAccount", "BankAccount")
                         .WithMany()
                         .HasForeignKey("BankAccountId");
 

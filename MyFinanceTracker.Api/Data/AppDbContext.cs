@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MyFinanceTracker.Api.Models;
 
-
 namespace MyFinanceTracker.Api.Data
 {
     public class AppDbContext : DbContext
@@ -11,19 +10,25 @@ namespace MyFinanceTracker.Api.Data
         }
 
         public DbSet<Transaction> Transactions { get; set; }
+        // Removed the redundant DbSet<Account> Accounts line
+        public DbSet<BankAccount> BankAccounts { get; set; } // Use this for all bank account operations
         public DbSet<Tag> Tags { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<Category> Categories { get; set; }
-        public DbSet<BankAccount> BankAccounts { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<BankAccount>() // TPH configuration
+
+
+            // Configure the discriminator for the BankAccount inheritance
+            modelBuilder.Entity<BankAccount>()
                 .HasDiscriminator<string>("AccountType") // Discriminator column
                 .HasValue<CheckingAccount>("Checking")
-                .HasValue<SavingsAccount>("Savings");
+                .HasValue<SavingsAccount>("Savings"); // This is the end of this configuration block, so it ends with a semicolon
         }
+
+
     }
 }

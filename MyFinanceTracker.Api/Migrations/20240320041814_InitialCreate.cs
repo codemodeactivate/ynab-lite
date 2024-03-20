@@ -69,6 +69,36 @@ namespace MyFinanceTracker.Api.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
+                name: "BankAccount",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    InstitutionName = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    AccountNumber = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    InterestRate = table.Column<double>(type: "double", nullable: true),
+                    Name = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Balance = table.Column<decimal>(type: "decimal(65,30)", nullable: false),
+                    Type = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    UserId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_BankAccount", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_BankAccount_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
                 name: "BankAccounts",
                 columns: table => new
                 {
@@ -120,9 +150,9 @@ namespace MyFinanceTracker.Api.Migrations
                 {
                     table.PrimaryKey("PK_Transactions", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Transactions_BankAccounts_BankAccountId",
+                        name: "FK_Transactions_BankAccount_BankAccountId",
                         column: x => x.BankAccountId,
-                        principalTable: "BankAccounts",
+                        principalTable: "BankAccount",
                         principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Transactions_Categories_CategoryId",
@@ -164,6 +194,11 @@ namespace MyFinanceTracker.Api.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateIndex(
+                name: "IX_BankAccount_UserId",
+                table: "BankAccount",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_BankAccounts_UserId",
                 table: "BankAccounts",
                 column: "UserId");
@@ -193,6 +228,9 @@ namespace MyFinanceTracker.Api.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "BankAccounts");
+
+            migrationBuilder.DropTable(
                 name: "TagTransaction");
 
             migrationBuilder.DropTable(
@@ -202,7 +240,7 @@ namespace MyFinanceTracker.Api.Migrations
                 name: "Transactions");
 
             migrationBuilder.DropTable(
-                name: "BankAccounts");
+                name: "BankAccount");
 
             migrationBuilder.DropTable(
                 name: "Categories");

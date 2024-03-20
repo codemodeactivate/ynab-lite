@@ -11,7 +11,7 @@ using MyFinanceTracker.Api.Data;
 namespace MyFinanceTracker.Api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240320132242_InitialCreate")]
+    [Migration("20240320145405_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -112,7 +112,7 @@ namespace MyFinanceTracker.Api.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Budget");
+                    b.ToTable("Budgets", (string)null);
                 });
 
             modelBuilder.Entity("MyFinanceTracker.Api.Models.BudgetCategory", b =>

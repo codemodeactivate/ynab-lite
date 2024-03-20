@@ -109,7 +109,7 @@ namespace MyFinanceTracker.Api.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Budget");
+                    b.ToTable("Budgets", (string)null);
                 });
 
             modelBuilder.Entity("MyFinanceTracker.Api.Models.BudgetCategory", b =>

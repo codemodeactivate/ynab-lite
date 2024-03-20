@@ -11,7 +11,7 @@ using MyFinanceTracker.Api.Data;
 namespace MyFinanceTracker.Api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240320041814_InitialCreate")]
+    [Migration("20240320132242_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -22,7 +22,34 @@ namespace MyFinanceTracker.Api.Migrations
                 .HasAnnotation("ProductVersion", "8.0.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
-            modelBuilder.Entity("BankAccount", b =>
+            modelBuilder.Entity("MyFinanceTracker.Api.Models.Account", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<string>("AccountName")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<decimal>("Balance")
+                        .HasColumnType("decimal(65,30)");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Account");
+                });
+
+            modelBuilder.Entity("MyFinanceTracker.Api.Models.BankAccount", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -55,49 +82,64 @@ namespace MyFinanceTracker.Api.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("BankAccounts");
+                    b.ToTable("Accounts");
 
                     b.HasDiscriminator<string>("AccountType").HasValue("BankAccount");
 
                     b.UseTphMappingStrategy();
                 });
 
-            modelBuilder.Entity("MyFinanceTracker.Api.Models.BankAccount", b =>
+            modelBuilder.Entity("MyFinanceTracker.Api.Models.Budget", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("BudgetId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<string>("AccountNumber")
+                    b.Property<string>("BudgetName")
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<decimal>("Balance")
-                        .HasColumnType("decimal(65,30)");
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("datetime(6)");
 
-                    b.Property<string>("InstitutionName")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<double?>("InterestRate")
-                        .HasColumnType("double");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("Type")
-                        .IsRequired()
-                        .HasColumnType("longtext");
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime(6)");
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
-                    b.HasKey("Id");
+                    b.HasKey("BudgetId");
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("BankAccount");
+                    b.ToTable("Budget");
+                });
+
+            modelBuilder.Entity("MyFinanceTracker.Api.Models.BudgetCategory", b =>
+                {
+                    b.Property<int>("BudgetCategoryId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("AllocatedAmount")
+                        .HasColumnType("decimal(65,30)");
+
+                    b.Property<int>("BudgetId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("SpentAmount")
+                        .HasColumnType("decimal(65,30)");
+
+                    b.HasKey("BudgetCategoryId");
+
+                    b.HasIndex("BudgetId");
+
+                    b.HasIndex("CategoryId");
+
+                    b.ToTable("BudgetCategory");
                 });
 
             modelBuilder.Entity("MyFinanceTracker.Api.Models.Category", b =>
@@ -110,7 +152,12 @@ namespace MyFinanceTracker.Api.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
+                    b.Property<int?>("UserId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Categories");
                 });
@@ -217,27 +264,31 @@ namespace MyFinanceTracker.Api.Migrations
                     b.ToTable("TagTransaction");
                 });
 
-            modelBuilder.Entity("CheckingAccount", b =>
+            modelBuilder.Entity("MyFinanceTracker.Api.Models.CheckingAccount", b =>
                 {
-                    b.HasBaseType("BankAccount");
+                    b.HasBaseType("MyFinanceTracker.Api.Models.BankAccount");
+
+                    b.ToTable("Accounts");
 
                     b.HasDiscriminator().HasValue("Checking");
                 });
 
-            modelBuilder.Entity("SavingsAccount", b =>
+            modelBuilder.Entity("MyFinanceTracker.Api.Models.SavingsAccount", b =>
                 {
-                    b.HasBaseType("BankAccount");
+                    b.HasBaseType("MyFinanceTracker.Api.Models.BankAccount");
 
                     b.Property<decimal>("InterestRate")
                         .HasColumnType("decimal(65,30)");
 
+                    b.ToTable("Accounts");
+
                     b.HasDiscriminator().HasValue("Savings");
                 });
 
-            modelBuilder.Entity("BankAccount", b =>
+            modelBuilder.Entity("MyFinanceTracker.Api.Models.Account", b =>
                 {
                     b.HasOne("MyFinanceTracker.Api.Models.User", "User")
-                        .WithMany()
+                        .WithMany("Accounts")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -254,6 +305,43 @@ namespace MyFinanceTracker.Api.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("MyFinanceTracker.Api.Models.Budget", b =>
+                {
+                    b.HasOne("MyFinanceTracker.Api.Models.User", "User")
+                        .WithMany("Budgets")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("MyFinanceTracker.Api.Models.BudgetCategory", b =>
+                {
+                    b.HasOne("MyFinanceTracker.Api.Models.Budget", "Budget")
+                        .WithMany("BudgetCategories")
+                        .HasForeignKey("BudgetId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("MyFinanceTracker.Api.Models.Category", "Category")
+                        .WithMany()
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Budget");
+
+                    b.Navigation("Category");
+                });
+
+            modelBuilder.Entity("MyFinanceTracker.Api.Models.Category", b =>
+                {
+                    b.HasOne("MyFinanceTracker.Api.Models.User", null)
+                        .WithMany("Categories")
+                        .HasForeignKey("UserId");
                 });
 
             modelBuilder.Entity("MyFinanceTracker.Api.Models.Transaction", b =>
@@ -292,6 +380,11 @@ namespace MyFinanceTracker.Api.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("MyFinanceTracker.Api.Models.Budget", b =>
+                {
+                    b.Navigation("BudgetCategories");
+                });
+
             modelBuilder.Entity("MyFinanceTracker.Api.Models.Category", b =>
                 {
                     b.Navigation("Transactions");
@@ -299,6 +392,12 @@ namespace MyFinanceTracker.Api.Migrations
 
             modelBuilder.Entity("MyFinanceTracker.Api.Models.User", b =>
                 {
+                    b.Navigation("Accounts");
+
+                    b.Navigation("Budgets");
+
+                    b.Navigation("Categories");
+
                     b.Navigation("Transactions");
                 });
 #pragma warning restore 612, 618

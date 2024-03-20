@@ -1,26 +1,28 @@
-﻿using MyFinanceTracker.Api.Models;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 
-public abstract class BankAccount
+namespace MyFinanceTracker.Api.Models
 {
-    public int Id { get; set; }
-    public string AccountName { get; set; } // Renamed from AccountName for consistency
-    public string AccountNumber { get; set; }
-    public string BankName { get; set; }
-    public decimal Balance { get; set; }
-    public int UserId { get; set; }
-    public string AccountType { get; set; } // To distinguish between Checking and Savings in the base class
+    // Assuming Account is not needed as a separate entity and BankAccount is the base class.
+    [Table("Accounts")] // Ensuring the table name is plural to follow conventions
+    public abstract class BankAccount
+    {
+        public int Id { get; set; }
+        public string AccountName { get; set; }
+        public string AccountNumber { get; set; }
+        public string BankName { get; set; }
+        public decimal Balance { get; set; }
+        public int UserId { get; set; }
+        public virtual User User { get; set; }
+        // Removed AccountType from here since it'll be handled by the discriminator in TPH
+    }
 
-    // Navigation property for EF Core
-    public User User { get; set; }
-}
+    public class CheckingAccount : BankAccount
+    {
+        // Properties specific to CheckingAccount can be added here
+    }
 
-public class CheckingAccount : BankAccount
-{
-    // CheckingAccount specific properties can go here
-    // For now, we'll inherit everything from BankAccount
-}
-
-public class SavingsAccount : BankAccount
-{
-    public decimal InterestRate { get; set; }
+    public class SavingsAccount : BankAccount
+    {
+        public decimal InterestRate { get; set; }
+    }
 }

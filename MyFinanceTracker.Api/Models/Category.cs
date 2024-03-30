@@ -6,5 +6,6 @@
         public string Name { get; set; } = string.Empty;
         // Optional: Additional properties for budgeting, etc.
         public List<Transaction> Transactions { get; set; } = new List<Transaction>();
+        public virtual ICollection<BudgetCategory> BudgetCategories { get; set; } = new List<BudgetCategory>();
     }
 }
